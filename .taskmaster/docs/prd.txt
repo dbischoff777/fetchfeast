@@ -1,0 +1,347 @@
+# Product Requirements Document: Fetch & Feast
+
+## Project Overview
+
+**Project Name:** Fetch & Feast  
+**Target Audience:** Dogs and their owners  
+**Platform:** Web (Next.js)  
+**Primary Target Device:** Tablets (iPad, Android tablets)  
+**Tech Stack:** Next.js 16+, shadcn/ui, Tailwind CSS 4+
+
+## Executive Summary
+
+Fetch & Feast is an interactive web-based game designed specifically for dogs. The game features animated objects that move across the screen in random patterns, which dogs can interact with by clicking/tapping. The game tracks scores, manages lives, and provides engaging visual feedback through animations and effects.
+
+## Core Requirements
+
+### 1. Landing Page
+
+**Purpose:** Welcome users and their dogs, provide game entry point
+
+**Features:**
+- Welcoming interface optimized for tablet landscape/portrait orientations
+- Large, prominent call-to-action button optimized for tablet touch interaction
+- Modern, clean UI design following tablet-specific industry standards
+- Tablet-first responsive design (768px - 1024px primary viewport)
+- Dog-friendly visual elements (extra-large touch targets, high contrast, clear visual hierarchy)
+- Full-screen immersive experience utilizing tablet screen real estate
+
+**Technical Requirements:**
+- Built using Next.js App Router
+- Styled with Tailwind CSS
+- UI components from shadcn/ui library
+- Tablet-optimized touch interactions (no hover states, touch-first design)
+- Accessible design (WCAG 2.1 AA minimum)
+- Landscape and portrait orientation support
+
+### 2. Game Core Mechanics
+
+**Object Movement System:**
+- Animated objects (using assets from `assets/animations/try/`) move around the screen
+- Randomly generated movement patterns that are unpredictable
+- Smooth, fluid animations (60fps target, using CSS transforms and requestAnimationFrame)
+- Objects can appear at various positions on screen
+- Movement should be continuous and natural-looking
+
+**Object Behavior:**
+- Objects can increase in size (pulse effect) for short periods
+- Pulse animation should be smooth and attention-grabbing
+- Pulse timing should be randomized to maintain unpredictability
+- Objects should be large enough for dogs to easily interact with on tablets
+- Minimum touch target size: 120x120px (tablet accessibility standard, suitable for dog paws/noses)
+- Optimal object size: 150-200px for better visibility and interaction on tablet screens
+- Objects should be positioned to avoid tablet bezels and safe areas
+
+**Interaction System:**
+- Touch/tap detection optimized for tablet screens (no mouse-specific interactions)
+- Immediate visual feedback on successful interaction
+- Responsive input handling (low latency, < 100ms touch response)
+- Support for multi-touch (ignore accidental multi-touch, focus on primary touch)
+- Touch event optimization to prevent scroll interference during gameplay
+
+### 3. Visual Effects & Animations
+
+**Success Feedback:**
+- When object is successfully clicked, trigger firework animation
+- Use random firework assets from `assets/animations/fireworks/` directory
+- Firework animation should play at the click location
+- Animation should complete before spawning next object
+- Multiple firework variations should be randomly selected
+
+**Object Animations:**
+- Primary object animation from `assets/animations/try/Object_1.gif` (and variations)
+- Smooth transitions between movement states
+- No stuttering or frame drops during gameplay
+
+### 4. Game State Management
+
+**Score System:**
+- Track total successful clicks/interactions
+- Display score prominently during gameplay
+- Use `assets/images/score.png` for score display UI element
+- Score increments by 1 for each successful interaction
+- Score persists throughout game session
+
+**Lives System:**
+- Total of 5 lives at game start
+- Lose 1 life for each failed interaction (missed click or timeout)
+- Display remaining lives using `assets/images/lives.png`
+- Visual indicator showing current lives count
+- Clear feedback when a life is lost
+
+**Game Flow:**
+- After successful click: show firework → spawn new object → continue
+- After failed interaction: lose life → show feedback → spawn new object (if lives remain)
+- When lives reach 0: transition to game over screen
+
+### 5. Game Over Screen
+
+**Features:**
+- Display final score prominently
+- Heartwarming, encouraging message for the next attempt
+- Message should be positive and motivating
+- "Replay" button to restart the game
+- "Quit" button to exit to landing page
+- Smooth transition animation from game to game over screen
+
+**UI Requirements:**
+- Extra-large, clear buttons optimized for tablet touch (minimum 120x120px)
+- High contrast for readability on tablet screens
+- Celebratory design elements that utilize tablet screen space effectively
+- Buttons positioned in safe areas (avoiding tablet bezels and system UI)
+
+### 6. Game Controls & Navigation
+
+**In-Game Controls:**
+- Quit button positioned at top-right corner, sized appropriately for tablet touch (minimum 80x80px)
+- Quit button should be accessible at all times during gameplay
+- Touch interaction should pause/exit game and return to landing page
+- Confirmation dialog recommended for tablets (to prevent accidental exits from paw/nose touches)
+- All controls must be in safe areas, avoiding tablet system UI overlays
+
+**Navigation Flow:**
+- Landing Page → Game → Game Over → (Replay or Quit)
+- Landing Page → Game → Quit (at any time) → Landing Page
+
+### 7. Technical Architecture
+
+**Code Organization:**
+- Modular component structure
+- Separation of concerns (UI, game logic, state management)
+- Reusable components where applicable
+- Clean, maintainable code following Next.js best practices
+- TypeScript for type safety
+
+**Component Structure:**
+```
+app/
+  page.tsx (Landing Page)
+  game/
+    page.tsx (Game Component)
+    components/
+      GameObject.tsx (Moving object component)
+      GameUI.tsx (Score, lives display)
+      FireworksEffect.tsx (Firework animation)
+      GameOverScreen.tsx (Game over modal/screen)
+    hooks/
+      useGameState.ts (Game state management)
+      useObjectMovement.ts (Object movement logic)
+      useAnimation.ts (Animation utilities)
+    utils/
+      gameLogic.ts (Core game mechanics)
+      animations.ts (Animation helpers)
+```
+
+**Performance Requirements:**
+- Smooth 60fps gameplay on tablet hardware (iPad, Android tablets)
+- No noticeable lag or stuttering
+- Optimized asset loading for tablet bandwidth considerations
+- Efficient animation rendering (use CSS transforms, avoid layout thrashing)
+- Responsive to touch input within 100ms
+- Optimized for tablet GPU acceleration
+- Memory-efficient for tablet device constraints
+
+**Browser Compatibility:**
+- **Primary:** Safari on iPad (iOS 14+), Chrome on Android tablets (Android 10+)
+- **Secondary:** Safari on iPadOS, Chrome/Edge on Android tablets
+- Tablet-specific optimizations (touch events, viewport handling, orientation changes)
+- Progressive enhancement for older tablet browsers
+- Full-screen API support for immersive tablet experience
+
+### 8. UI/UX Standards
+
+**Design Principles:**
+- Modern, clean interface optimized for tablet viewports (768px - 1024px primary)
+- High contrast for visibility on tablet screens (important for dogs and owners)
+- Extra-large touch targets optimized for tablet interaction (minimum 120x120px for game objects, 100x100px for UI buttons)
+- Clear visual hierarchy utilizing tablet screen real estate
+- Consistent spacing and typography sized for tablet viewing distances
+- Smooth transitions and micro-interactions optimized for tablet touch
+- Landscape and portrait orientation support with layout adjustments
+- Full-screen immersive experience when possible
+
+**Tablet-Specific UX Considerations:**
+- Touch-first design (no hover states, all interactions via touch)
+- Prevent default scroll behavior during gameplay
+- Handle orientation changes gracefully (pause game or maintain state)
+- Safe area insets for notched tablets (iPad Pro, etc.)
+- Large, readable text (minimum 16px, preferably 18-20px for body text)
+- Generous spacing between interactive elements (minimum 16px padding)
+- Visual feedback for all touch interactions (ripple effects, scale animations)
+
+**Accessibility:**
+- WCAG 2.1 AA compliance
+- Touch accessibility (large targets, clear feedback)
+- Screen reader friendly text
+- High contrast mode support
+- Support for tablet accessibility features (VoiceOver, TalkBack)
+
+**Responsive Design:**
+- Tablet-first approach (optimized for 768px - 1024px viewports)
+- Primary breakpoints: md (768px - tablets portrait), lg (1024px - tablets landscape)
+- Touch-optimized interface (no mouse-specific interactions)
+- Orientation-aware layouts (landscape/portrait adaptations)
+- Viewport meta tag optimized for tablets: `<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">`
+
+### 9. Asset Integration
+
+**Image Assets:**
+- Lives indicator: `assets/images/lives.png` (sized appropriately for tablet UI)
+- Score display: `assets/images/score.png` (sized appropriately for tablet UI)
+- Game backgrounds: `assets/images/gameBackgrounds/floor1.png`, `floor2.png` (optimized for tablet resolutions)
+- Avatars: `assets/images/avatars/` (optional for personalization)
+- Cursor: `assets/images/pawCursor.png` (not applicable for touch-only tablet interface)
+
+**Animation Assets:**
+- Try objects: `assets/animations/try/Object_1.gif` through `Object_5.gif`, `Try.gif`, variations
+- Fireworks: `assets/animations/fireworks/fireworks animated_1.gif` through `fireworks animated_6.gif`
+- Success animations: `assets/animations/success/` (optional for additional feedback)
+- Fail animation: `assets/animations/fail/fail1.gif` (for life loss feedback)
+
+**Audio Assets:**
+- Sound effects: `assets/sounds/Try.mp3` (optional integration)
+
+### 10. shadcn/ui Integration
+
+**Components to Use:**
+- Button component for all interactive elements
+- Dialog/Modal for game over screen
+- Card component for UI containers (if needed)
+- Custom components built on shadcn/ui primitives
+
+**Styling:**
+- Use Tailwind CSS utility classes
+- Leverage shadcn/ui theming system
+- Custom animations via Tailwind or CSS modules
+- Consistent design tokens
+
+## Non-Functional Requirements
+
+### Performance
+- Initial load time: < 3 seconds on tablet network conditions
+- Game start time: < 1 second after touch interaction
+- Animation frame rate: consistent 60fps on tablet hardware
+- Touch input latency: < 100ms
+- Optimized for tablet GPU capabilities
+- Efficient memory usage for tablet device constraints
+
+### Stability
+- No crashes or unhandled errors
+- Graceful error handling
+- Fallback states for asset loading failures
+- Memory leak prevention (cleanup animations and event listeners)
+
+### Code Quality
+- TypeScript strict mode enabled
+- ESLint configuration for code consistency
+- Modular, testable code structure
+- Clear naming conventions
+- Comprehensive comments for complex logic
+
+### Dog-Friendly Design (Tablet-Optimized)
+- Extra-large, clear visual elements sized for tablet screens
+- High contrast colors optimized for tablet display brightness
+- Predictable, consistent behavior
+- No sudden loud sounds (or volume controls)
+- Simple, intuitive touch interaction model
+- Objects and buttons sized for dog paw/nose interaction on tablets
+- Full-screen gameplay to minimize distractions
+
+## Success Criteria
+
+1. **Functionality:** All core game mechanics work as specified on tablet devices
+2. **Performance:** Game runs smoothly at 60fps on target tablet devices (iPad, Android tablets)
+3. **User Experience:** Intuitive tablet-optimized interface that dogs can interact with successfully via touch
+4. **Code Quality:** Modular, maintainable codebase following best practices
+5. **Visual Polish:** Smooth animations and engaging visual feedback optimized for tablet screens
+6. **Accessibility:** Meets WCAG 2.1 AA standards with tablet-specific touch accessibility
+7. **Tablet Optimization:** Game performs excellently in both landscape and portrait orientations
+
+## Out of Scope (Future Enhancements)
+
+- User profiles/personalization
+- Difficulty levels
+- Leaderboards
+- Sound effects integration (marked as optional)
+- Multiplayer features
+- Tutorial system (tutorial assets exist but not required for MVP)
+- Avatar selection (avatars exist but not required for MVP)
+
+## Technical Constraints
+
+- Must use Next.js 16+ App Router
+- Must use shadcn/ui for UI components
+- Must use Tailwind CSS 4+ for styling
+- Must be compatible with existing asset structure
+- TypeScript required for type safety
+- No external game engines (pure React/Next.js implementation)
+
+## Development Phases
+
+### Phase 1: Foundation
+- Set up project structure
+- Install and configure shadcn/ui
+- Create landing page
+- Set up routing
+
+### Phase 2: Core Game
+- Implement object movement system
+- Create game state management
+- Build interaction detection
+- Implement score and lives systems
+
+### Phase 3: Visual Effects
+- Integrate firework animations
+- Add pulse effects to objects
+- Implement game over screen
+- Add visual feedback for interactions
+
+### Phase 4: Polish
+- Optimize animations for performance
+- Refine UI/UX
+- Add transitions and micro-interactions
+- Testing and bug fixes
+
+### Phase 5: Finalization
+- Accessibility audit
+- Performance optimization
+- Cross-browser testing
+- Documentation
+
+## Notes
+
+- The game should be enjoyable for dogs, meaning interactions should be rewarding and clear
+- Visual feedback is crucial for both dogs and owners to understand game state
+- Performance is critical - stuttering animations will reduce engagement on tablets
+- Code modularity ensures maintainability and future enhancements
+- All animations should use hardware acceleration when possible (CSS transforms, will-change property)
+- **Tablet-Specific Considerations:**
+  - Design for touch interaction only (no mouse events needed)
+  - Optimize for tablet screen sizes and viewing distances
+  - Handle orientation changes gracefully
+  - Test on actual tablet devices (iPad, Android tablets) during development
+  - Consider tablet-specific performance characteristics (GPU, memory, battery)
+  - Ensure UI elements are positioned in safe areas (avoiding system UI overlays)
+  - Prevent accidental scrolling/swiping during gameplay
+  - Optimize asset sizes for tablet resolutions (avoid over-sized images)
+
