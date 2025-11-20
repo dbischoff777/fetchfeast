@@ -39,11 +39,15 @@ import {
 // Browser compatibility utilities
 import { logBrowserCompatibility } from "../utils/browserCompatibility";
 
+// High score utilities
+import { recordGameSession, updateHighScore } from "../utils/highScore";
+
 export default function Game() {
   const router = useRouter();
   const gameContainerRef = useRef<HTMLDivElement>(null);
   const objectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const [isSpawningNewObject, setIsSpawningNewObject] = useState(false);
+  const gameStartTimeRef = useRef<number | null>(null);
 
   // Game state management
   const {
@@ -76,6 +80,8 @@ export default function Game() {
   // Start game on component mount
   useEffect(() => {
     startGame();
+    // Record game start time for playtime tracking
+    gameStartTimeRef.current = Date.now();
   }, [startGame]);
 
   // Request fullscreen when game starts (optional, user can dismiss)
@@ -223,6 +229,25 @@ export default function Game() {
     resetObject();
   }, [gameState.isPlaying, showFireworks, showFailAnimation, gameState.isGameOver, isSpawningNewObject, decrementLives, triggerFailAnimation, resetObject]);
 
+  // Record game session and update high score when game ends
+  useEffect(() => {
+    if (gameState.isGameOver && gameStartTimeRef.current) {
+      // Calculate playtime in seconds
+      const playtimeSeconds = Math.floor(
+        (Date.now() - gameStartTimeRef.current) / 1000
+      );
+
+      // Update high score
+      updateHighScore(gameState.score);
+
+      // Record game session
+      recordGameSession(gameState.score, playtimeSeconds);
+
+      // Reset start time
+      gameStartTimeRef.current = null;
+    }
+  }, [gameState.isGameOver, gameState.score]);
+
   // Announce game over to screen readers
   useEffect(() => {
     if (gameState.isGameOver) {
@@ -327,6 +352,8 @@ export default function Game() {
     setIsSpawningNewObject(false);
     resetGame();
     resetObject();
+    // Reset game start time for new session
+    gameStartTimeRef.current = Date.now();
   };
 
   // Memoized components for performance

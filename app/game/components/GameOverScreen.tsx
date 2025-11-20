@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -8,6 +9,7 @@ import {
   DialogTitle,
   DialogDescription,
 } from "@/components/ui/dialog";
+import { getHighScore, isNewRecord, getGameStats } from "@/app/utils/highScore";
 
 type GameOverScreenProps = {
   score: number;
@@ -22,8 +24,26 @@ export default function GameOverScreen({
   onQuit,
   isOpen,
 }: GameOverScreenProps) {
+  const [highScore, setHighScore] = useState(0);
+  const [newRecord, setNewRecord] = useState(false);
+  const [gameStats, setGameStats] = useState(getGameStats());
+
+  // Update high score when dialog opens
+  useEffect(() => {
+    if (isOpen) {
+      const currentHighScore = getHighScore();
+      const isRecord = isNewRecord(score);
+      setHighScore(currentHighScore);
+      setNewRecord(isRecord);
+      setGameStats(getGameStats());
+    }
+  }, [isOpen, score]);
+
   // Determine encouraging message based on score
   const getMessage = () => {
+    if (newRecord) {
+      return "🎉 New Record! Amazing job! 🎉";
+    }
     if (score >= 30) return "Amazing job! You're a Fetch & Feast champion! 🏆";
     if (score >= 20) return "Great work! You're getting really good at this! ⭐";
     if (score >= 10) return "Nice playing! Keep practicing to improve your score! 🎯";
@@ -51,10 +71,32 @@ export default function GameOverScreen({
 
         {/* Animated score display */}
         <div className="score-display my-6 text-center">
+          {newRecord && (
+            <div className="mb-4 animate-bounce">
+              <span className="inline-block bg-yellow-400 text-blue-900 px-4 py-2 rounded-full text-lg md:text-xl font-bold shadow-lg">
+                🏆 NEW RECORD! 🏆
+              </span>
+            </div>
+          )}
           <div className="text-5xl md:text-6xl font-bold text-yellow-500 animate-score-pulse mb-2">
             {score}
           </div>
           <div className="text-xl text-blue-600 mt-1 font-semibold">Final Score</div>
+          
+          {/* High score display */}
+          {highScore > 0 && (
+            <div className="mt-4 pt-4 border-t-2 border-blue-200">
+              <div className="text-sm md:text-base text-blue-600 mb-1">Personal Best</div>
+              <div className="text-2xl md:text-3xl font-bold text-blue-800">
+                {highScore}
+              </div>
+              {!newRecord && score < highScore && (
+                <div className="text-xs md:text-sm text-blue-500 mt-1">
+                  {highScore - score} points away from your best!
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
         <div className="text-center mb-6 md:mb-8">
