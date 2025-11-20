@@ -295,24 +295,6 @@ class SoundManager {
           this.activeSources.delete(id);
         };
 
-        // Handle errors on the source node
-        source.onerror = () => {
-          this.activeSources.delete(id);
-          // Mark context as potentially broken - will be recreated on next play
-          if (this.audioContext) {
-            try {
-              if (this.audioContext.state === 'running') {
-                // Context might still be ok, but source failed
-                return;
-              }
-            } catch (error) {
-              // Context is broken
-              this.audioContext = null;
-              this.initialized = false;
-            }
-          }
-        };
-
         // Start playback with error handling
         try {
           source.start(0);
