@@ -40,7 +40,7 @@ import {
 import { logBrowserCompatibility } from "../utils/browserCompatibility";
 
 // High score utilities
-import { recordGameSession, updateHighScore } from "../utils/highScore";
+import { recordGameSession, updateHighScore, getHighScore } from "../utils/highScore";
 
 export default function Game() {
   const router = useRouter();
@@ -229,19 +229,31 @@ export default function Game() {
     resetObject();
   }, [gameState.isPlaying, showFireworks, showFailAnimation, gameState.isGameOver, isSpawningNewObject, decrementLives, triggerFailAnimation, resetObject]);
 
+  // Track high score state to pass to GameOverScreen
+  const [currentHighScore, setCurrentHighScore] = useState(() => getHighScore());
+  const [isNewRecord, setIsNewRecord] = useState(false);
+
   // Record game session and update high score when game ends
   useEffect(() => {
     if (gameState.isGameOver && gameStartTimeRef.current) {
+      // Get current high score BEFORE updating
+      const previousHighScore = getHighScore();
+      
       // Calculate playtime in seconds
       const playtimeSeconds = Math.floor(
         (Date.now() - gameStartTimeRef.current) / 1000
       );
 
-      // Update high score
-      updateHighScore(gameState.score);
-
+      // Update high score and check if it's a new record
+      const isRecord = updateHighScore(gameState.score);
+      
       // Record game session
       recordGameSession(gameState.score, playtimeSeconds);
+
+      // Update state with the new high score (after localStorage update)
+      const newHighScore = getHighScore();
+      setCurrentHighScore(newHighScore);
+      setIsNewRecord(isRecord);
 
       // Reset start time
       gameStartTimeRef.current = null;
@@ -422,6 +434,8 @@ export default function Game() {
       {/* Game over screen */}
       <GameOverScreen
         score={gameState.score}
+        highScore={currentHighScore}
+        isNewRecord={isNewRecord}
         onReplay={handleReplay}
         onQuit={handleQuit}
         isOpen={gameState.isGameOver}
