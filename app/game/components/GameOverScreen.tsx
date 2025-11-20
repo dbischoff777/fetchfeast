@@ -22,10 +22,18 @@ export default function GameOverScreen({
   onQuit,
   isOpen,
 }: GameOverScreenProps) {
+  // Determine encouraging message based on score
+  const getMessage = () => {
+    if (score >= 30) return "Amazing job! You're a Fetch & Feast champion! 🏆";
+    if (score >= 20) return "Great work! You're getting really good at this! ⭐";
+    if (score >= 10) return "Nice playing! Keep practicing to improve your score! 🎯";
+    return "Good effort! Try again to beat your score! 🐾";
+  };
+
   return (
     <Dialog open={isOpen} onOpenChange={() => {}}>
       <DialogContent
-        className="sm:max-w-md md:max-w-lg p-6 md:p-8"
+        className="sm:max-w-md md:max-w-lg p-6 md:p-8 bg-white"
         showCloseButton={false}
       >
         <DialogHeader>
@@ -41,9 +49,17 @@ export default function GameOverScreen({
           </DialogDescription>
         </DialogHeader>
 
+        {/* Animated score display */}
+        <div className="score-display my-6 text-center">
+          <div className="text-5xl md:text-6xl font-bold text-yellow-500 animate-score-pulse mb-2">
+            {score}
+          </div>
+          <div className="text-xl text-blue-600 mt-1 font-semibold">Final Score</div>
+        </div>
+
         <div className="text-center mb-6 md:mb-8">
-          <p className="text-lg md:text-xl text-blue-900 mb-2 font-semibold">
-            That was pawsome! 🐾
+          <p className="text-lg md:text-xl text-blue-700 mb-2 font-semibold">
+            {getMessage()}
           </p>
           <p className="text-base md:text-lg text-blue-800">
             Want to play again?

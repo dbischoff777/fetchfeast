@@ -178,10 +178,18 @@
 .will-change-transform,
 .animated-element,
 .game-object {
-  will-change: transform;
+  will-change: transform, opacity;
   transform: translateZ(0); /* Force GPU acceleration */
   backface-visibility: hidden;
   perspective: 1000px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Optimize game object container for better performance */
+.game-object-container {
+  contain: layout style paint;
+  isolation: isolate;
 }
 
 /* Custom slow bounce animation for mascot */
@@ -196,6 +204,205 @@
 
 .animate-bounce-slow {
   animation: bounce-slow 3s ease-in-out infinite;
+}
+
+/* Gentle floating animation for landing page mascot */
+@keyframes float-gentle {
+  0%, 100% {
+    transform: translateY(0) translateZ(0);
+  }
+  50% {
+    transform: translateY(-10px) translateZ(0);
+  }
+}
+
+.animate-float-gentle {
+  animation: float-gentle 4s ease-in-out infinite;
+}
+
+/* Background pattern float animation */
+@keyframes float {
+  0%, 100% {
+    transform: translate(0, 0);
+  }
+  33% {
+    transform: translate(20px, -20px);
+  }
+  66% {
+    transform: translate(-20px, 20px);
+  }
+}
+
+/* Fade in animations for landing page */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.6s ease-out forwards;
+}
+
+.animate-fade-in-delay {
+  animation: fade-in 0.6s ease-out 0.2s forwards;
+  opacity: 0;
+}
+
+.animate-fade-in-delay-2 {
+  animation: fade-in 0.6s ease-out 0.4s forwards;
+  opacity: 0;
+}
+
+.animate-fade-in-delay-3 {
+  animation: fade-in 0.6s ease-out 0.6s forwards;
+  opacity: 0;
+}
+
+/* Game object visual feedback improvements */
+.game-object-container {
+  transition: transform 0.2s ease-out;
+}
+
+.game-object-container:hover,
+.game-object-container:focus-visible {
+  transform: scale(1.1) translateZ(0);
+}
+
+.game-object-container:active {
+  transform: scale(0.95) translateZ(0);
+}
+
+/* Pulse/glow effect for game objects */
+@keyframes object-pulse {
+  0%, 100% {
+    opacity: 0.4;
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.7);
+  }
+  50% {
+    opacity: 0.6;
+    transform: scale(1.05);
+    box-shadow: 0 0 20px 10px rgba(59, 130, 246, 0.4);
+  }
+}
+
+.game-object-pulse {
+  background: radial-gradient(circle, rgba(59, 130, 246, 0.3) 0%, transparent 70%);
+  border-radius: 50%;
+  animation: object-pulse 2s ease-in-out infinite;
+  z-index: -1;
+}
+
+.game-object-image {
+  transition: transform 0.15s ease-out, filter 0.15s ease-out;
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2));
+}
+
+.game-object-container:hover .game-object-image,
+.game-object-container:focus-visible .game-object-image {
+  transform: scale(1.05);
+  filter: drop-shadow(0 6px 12px rgba(59, 130, 246, 0.4));
+}
+
+/* Fail effect visual improvements */
+@keyframes fail-effect-pop {
+  0% {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1.5);
+    opacity: 0;
+  }
+}
+
+@keyframes fail-effect-glow {
+  0%, 100% {
+    opacity: 0.6;
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.8);
+  }
+  50% {
+    opacity: 0.9;
+    transform: scale(1.1);
+    box-shadow: 0 0 30px 15px rgba(239, 68, 68, 0.6);
+  }
+}
+
+.fail-effect-container {
+  animation: fail-effect-pop 1s ease-out forwards;
+}
+
+.fail-effect-glow {
+  background: radial-gradient(circle, rgba(239, 68, 68, 0.5) 0%, transparent 70%);
+  border-radius: 50%;
+  animation: fail-effect-glow 1s ease-out infinite;
+  z-index: -1;
+}
+
+.fail-effect-image {
+  filter: drop-shadow(0 4px 12px rgba(239, 68, 68, 0.6));
+}
+
+/* Game Over Screen animations */
+@keyframes score-pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+}
+
+.animate-score-pulse {
+  animation: score-pulse 2s ease-in-out infinite;
+}
+
+/* Confetti animation */
+@keyframes confetti-fall {
+  0% {
+    transform: translateY(0) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(600px) rotate(720deg);
+    opacity: 0;
+  }
+}
+
+.confetti-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.confetti-piece {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  animation: confetti-fall 3s linear forwards;
+  border-radius: 2px;
+}
+
+/* Responsive confetti for smaller screens */
+@media (max-width: 768px) {
+  .confetti-container {
+    display: none; /* Disable confetti on mobile for performance */
+  }
 }
 
 /* Optimize animations */
@@ -221,6 +428,44 @@
   backface-visibility: hidden;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+/* Use CSS containment for better performance */
+[data-game-container] {
+  contain: layout style paint;
+}
+
+/* Optimize animations to use transform and opacity only */
+@keyframes pulse {
+  0% { 
+    transform: scale(1) translateZ(0); 
+    opacity: 0.7; 
+  }
+  50% { 
+    transform: scale(1.05) translateZ(0); 
+    opacity: 0.9; 
+  }
+  100% { 
+    transform: scale(1) translateZ(0); 
+    opacity: 0.7; 
+  }
+}
+
+.pulse-animation {
+  animation: pulse 2s infinite ease-in-out;
+  will-change: transform, opacity;
+}
+
+/* Reduce paint operations by using opacity/transform instead of visibility/display */
+.fade-in {
+  opacity: 0;
+  transform: translateZ(0);
+  transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+}
+
+.fade-in.visible {
+  opacity: 1;
+  transform: translateZ(0);
 }
 
 /* Optimize image rendering */

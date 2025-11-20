@@ -76,7 +76,7 @@ const GameObject = forwardRef<GameObjectRef, GameObjectProps>(
   return (
     <div
       ref={objectRef}
-      className="absolute game-object will-change-transform"
+      className="absolute game-object will-change-transform game-object-container"
       style={{
         width: `${GAME_CONFIG.OPTIMAL_OBJECT_SIZE}px`,
         height: `${GAME_CONFIG.OPTIMAL_OBJECT_SIZE}px`,
@@ -89,15 +89,21 @@ const GameObject = forwardRef<GameObjectRef, GameObjectProps>(
       tabIndex={0}
       aria-label={ariaLabel}
     >
-      <Image
-        src={`/assets/animations/try/Object_${objectIndex}.gif`}
-        alt={`Game object ${objectIndex}`}
-        width={GAME_CONFIG.OPTIMAL_OBJECT_SIZE}
-        height={GAME_CONFIG.OPTIMAL_OBJECT_SIZE}
-        className="w-full h-full object-contain pointer-events-none"
-        priority
-        unoptimized
-      />
+      {/* Pulse/glow effect */}
+      <div className="absolute inset-0 rounded-full game-object-pulse pointer-events-none" />
+      
+      {/* Main object image */}
+      <div className="relative w-full h-full game-object-image">
+        <Image
+          src={`/assets/animations/try/Object_${objectIndex}.gif`}
+          alt={`Game object ${objectIndex}`}
+          width={GAME_CONFIG.OPTIMAL_OBJECT_SIZE}
+          height={GAME_CONFIG.OPTIMAL_OBJECT_SIZE}
+          className="w-full h-full object-contain pointer-events-none"
+          priority
+          unoptimized
+        />
+      </div>
     </div>
   );
 });

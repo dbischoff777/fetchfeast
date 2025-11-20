@@ -1,8 +1,10 @@
-// FPS monitoring
+// Enhanced FPS monitoring with warnings
 export const setupFPSMonitoring = (): (() => number) => {
   let frameCount = 0;
   let lastTime = performance.now();
   let fps = 0;
+  let lowFpsCount = 0;
+  const LOW_FPS_THRESHOLD = 55; // Warn if FPS drops below 55
 
   const countFrame = () => {
     frameCount++;
@@ -14,7 +16,19 @@ export const setupFPSMonitoring = (): (() => number) => {
       frameCount = 0;
       lastTime = now;
 
-      // FPS tracking (logging removed for cleaner console)
+      // Log warning if FPS is consistently low (only in development)
+      if (process.env.NODE_ENV === "development") {
+        if (fps < LOW_FPS_THRESHOLD) {
+          lowFpsCount++;
+          if (lowFpsCount >= 3) {
+            // Only warn after 3 consecutive low FPS readings
+            console.warn(`Low FPS detected: ${fps} fps (target: 60 fps)`);
+            lowFpsCount = 0; // Reset counter after warning
+          }
+        } else {
+          lowFpsCount = 0; // Reset counter if FPS is good
+        }
+      }
     }
 
     requestAnimationFrame(countFrame);
@@ -28,13 +42,27 @@ export const setupFPSMonitoring = (): (() => number) => {
 // Touch response time monitoring
 export const measureTouchResponseTime = (): (() => void) => {
   let touchStartTime = 0;
+  const MAX_REASONABLE_RESPONSE_TIME = 5000; // 5 seconds max - anything beyond is likely a calculation error
 
   const handleTouchStart = () => {
     touchStartTime = performance.now();
   };
 
   const handleTouchEnd = () => {
+    // Only calculate if we have a valid touchStartTime
+    if (touchStartTime === 0) {
+      return; // No corresponding touchstart - ignore this touchend
+    }
+
     const responseTime = performance.now() - touchStartTime;
+
+    // Reset touchStartTime after calculation
+    touchStartTime = 0;
+
+    // Ignore unreasonably large values (likely calculation errors)
+    if (responseTime > MAX_REASONABLE_RESPONSE_TIME) {
+      return;
+    }
 
     if (process.env.NODE_ENV === "development") {
       console.log(`Touch response time: ${responseTime.toFixed(2)}ms`);
@@ -48,12 +76,19 @@ export const measureTouchResponseTime = (): (() => void) => {
     }
   };
 
+  // Also handle touchcancel to reset the timer
+  const handleTouchCancel = () => {
+    touchStartTime = 0;
+  };
+
   document.addEventListener("touchstart", handleTouchStart, { passive: true });
   document.addEventListener("touchend", handleTouchEnd, { passive: true });
+  document.addEventListener("touchcancel", handleTouchCancel, { passive: true });
 
   return () => {
     document.removeEventListener("touchstart", handleTouchStart);
     document.removeEventListener("touchend", handleTouchEnd);
+    document.removeEventListener("touchcancel", handleTouchCancel);
   };
 };
 

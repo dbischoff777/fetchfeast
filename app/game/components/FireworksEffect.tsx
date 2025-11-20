@@ -14,6 +14,8 @@ export default function FireworksEffect({
   onComplete,
 }: FireworksEffectProps) {
   const [fireworkIndex, setFireworkIndex] = useState(1);
+  const fireworksSize = 400; // Increased size for better visibility (was 300)
+  const offset = fireworksSize / 2; // Center the animation on the position
 
   useEffect(() => {
     // Randomly select one of the 6 firework animations
@@ -33,9 +35,9 @@ export default function FireworksEffect({
     <div
       className="absolute z-50 animated-element will-change-transform pointer-events-none"
       style={{
-        transform: `translate3d(${position.x - 150}px, ${position.y - 150}px, 0)`,
-        width: "300px",
-        height: "300px",
+        transform: `translate3d(${position.x - offset}px, ${position.y - offset}px, 0)`,
+        width: `${fireworksSize}px`,
+        height: `${fireworksSize}px`,
         opacity: 1,
         transition: "opacity 0.1s ease-out", // Smooth fade out when unmounting
       }}
@@ -43,8 +45,8 @@ export default function FireworksEffect({
       <Image
         src={`/assets/animations/fireworks/fireworks animated_${fireworkIndex}.gif`}
         alt="Firework celebration"
-        width={300}
-        height={300}
+        width={fireworksSize}
+        height={fireworksSize}
         className="w-full h-full object-contain"
         priority
         unoptimized

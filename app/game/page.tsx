@@ -4,6 +4,7 @@ import { useRef, useEffect, useCallback, memo, useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 
+
 // Components
 import GameObject from "./components/GameObject";
 import FireworksEffect from "./components/FireworksEffect";
@@ -16,6 +17,9 @@ import { useGameState } from "./hooks/useGameState";
 import { useObjectMovement } from "./hooks/useObjectMovement";
 import { useAnimation } from "./hooks/useAnimation";
 import { useTabletOptimization } from "../hooks/useTabletOptimization";
+
+// Sound manager
+import soundManager, { SoundType } from "./utils/soundManager";
 
 // Performance utilities
 import {
@@ -31,6 +35,9 @@ import {
   announceToScreenReader,
   setupKeyboardNavigation,
 } from "../utils/accessibility";
+
+// Browser compatibility utilities
+import { logBrowserCompatibility } from "../utils/browserCompatibility";
 
 export default function Game() {
   const router = useRouter();
@@ -81,6 +88,13 @@ export default function Game() {
       return () => clearTimeout(timer);
     }
   }, [gameState.isPlaying, requestFullscreen]);
+
+  // Log browser compatibility info in development
+  useEffect(() => {
+    if (process.env.NODE_ENV === "development") {
+      logBrowserCompatibility();
+    }
+  }, []);
 
   // Set up performance monitoring in development
   useEffect(() => {
@@ -143,6 +157,9 @@ export default function Game() {
       objectTimeoutRef.current = null;
     }
 
+    // Play success sound
+    soundManager.play(SoundType.SUCCESS);
+
     // Increment score and trigger fireworks
     // The game object will be hidden immediately due to !showFireworks condition
     incrementScore();
@@ -152,6 +169,9 @@ export default function Game() {
   // Handle missed object (timeout)
   const handleObjectMiss = useCallback(() => {
     if (!gameState.isPlaying || showFireworks || gameState.isGameOver) return;
+
+    // Play miss sound
+    soundManager.play(SoundType.MISS);
 
     decrementLives();
     triggerFailAnimation(position);
@@ -183,6 +203,9 @@ export default function Game() {
       clearTimeout(objectTimeoutRef.current);
       objectTimeoutRef.current = null;
     }
+
+    // Play miss sound
+    soundManager.play(SoundType.MISS);
 
     // This is a missclick - subtract a life
     decrementLives();

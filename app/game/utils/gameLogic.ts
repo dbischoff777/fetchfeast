@@ -1,7 +1,7 @@
 // Constants for game configuration
 export const GAME_CONFIG = {
   MIN_OBJECT_SIZE: 120, // Minimum size in pixels (for dog interaction)
-  OPTIMAL_OBJECT_SIZE: 180, // Optimal size for visibility
+  OPTIMAL_OBJECT_SIZE: 220, // Optimal size for visibility (increased from 180)
   ANIMATION_DURATION: 5000, // Base duration for object movement in ms
   PULSE_INTERVAL_MIN: 1000, // Minimum time between pulses in ms
   PULSE_INTERVAL_MAX: 3000, // Maximum time between pulses in ms
